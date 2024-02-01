@@ -1,0 +1,121 @@
+@startuml "APPLICATION_BANCAIRE"
+
+abstract Compte {
+   - nom: String
+   - numero: String
+   - solde: double
+   - type: Enum TypeCompte
+   .. Getters / Setters ..
+   + getNom(): String
+   + getNumero(): String
+   + getSolde(): double
+   + getType(): TypeCompte
+   + setNom(valeur: String): void
+   + setTypeCompte(valeur: Enum TypeCompte): void
+   .. Methods ..
+   + deposer(): void
+   + retirer(): void
+}
+
+class CompteCourant extends Compte {
+   - charges: Charge[]
+   - revenus: Revenu[]
+   - decouvertAutorise: double
+   ____
+   + CompteCourant(super.nom, super.numero, super.solde, 
+      super.type, charges, revenus, decouvertAutorise)
+   .. Getters / Setters ..
+   + getCharges(): Charges[]
+   + getRevenus(): Revenus[]
+   .. Methods ..
+   + ajouterCharge(charge: Charge): void
+   + supprimerCharge(charge: Charge): void
+   + ajouterRevenu(revenu: Revenu): void
+   + supprimerRevenu(revenu: Revenu): void
+   + retirer(montant: double): void
+   + soldePositif(): bool
+   + decouvertOn(montant: double): void
+   + decouvertOff(): void
+}
+
+class CompteEpargne extends Compte {
+   - tauxInteret: double
+   ____
+   + CompteCourant(super.nom, super.numero, super.solde, 
+      super.type, charges, revenus, tauxInteret)
+   .. Getters / Setters ..
+   + getTauxInteret(): double
+   + setTauxInteret(double valeur): void
+   .. Methods ..
+   + calculerInterets(): double
+}
+
+class Operation {
+   - nom: String
+   - montant: double
+   - type: Enum TypeOperation
+   ____
+   + Operation(nom, montant)
+   .. Getters / Setters ..
+   + getNom(): String
+   + getMontant(): double
+   + getType(): Enum TypeOperation
+   .. Methods ..
+}
+
+class OperationMensuelle extends Operation {
+   - duree: int
+   ____
+   + OperationMensuelle(super.nom, super.montant, super.type, duree = -1)
+   .. Getters / Setters ..
+   + getDuree(): int
+   .. Methods ..
+   + dureeNegative(): bool
+   + dureeAZero(): bool
+   + reduireDuree(): void
+}
+
+class Journalisation {
+   - static instance: Map<String, Journalisation>
+   - operation: String[]
+   ____
+   - Journalisation()
+   + static getInstance(clef: String): Journalisation
+   + journaliser(operation: String): void
+   + afficher(): void
+}
+
+class Client {
+   - nom: String
+   - prenom: String
+   - compte: Compte[]
+   ____
+   + Client(nom, prenom, adresse, compte)
+   .. Getters / Setters ..
+   + getNom(): String
+   + getPrenom(): String
+   + getCompte(): Compte[]
+   + setNom(valeur): void
+   + setPrenom(valeur): void
+   .. Methods ..
+   + ajouterCompte(compte: Compte): void
+   + supprimerCompte(compte: Compte): void
+}
+
+class Banque {
+   - nom: String
+   - client: Client[]
+   ____
+   Banque(nom, client)
+   .. Getters / Setters ..
+   + getNom(): String
+   + getClient(): Client[]
+   .. Methods ..
+   + ajouterClient(client: Client): void
+   + supprimerClient(client: Client): void
+}
+
+Compte "1" -- "1" Client
+Client "1" -- "1..*" Banque
+
+@enduml
